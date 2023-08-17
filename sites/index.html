@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My HTML Page</title>
+    <script src="./base64js.min.js"></script>
+    <script src="./b64_bench.js"></script>
+</head>
+
+<body>
+    <h1>Welcome to my HTML page!</h1>
+    <p>This is a basic HTML file.</p>
+
+    <script type="module">
+        import { bench, initSync } from './pkg/b64_bench.js'
+
+        fetch('./pkg/b64_bench_bg.wasm').then(res => res.arrayBuffer()).then(res => {
+            initSync(res)
+
+            let start = Date.now()
+            let len = 0
+            for (let i = 0; i < 10; i++) {
+                len += bench(10000, 1000)
+            }
+            console.log('wasm: ', len)
+            alert('wasm: ' + ((Date.now() - start) / 100) + " ms")
+        })
+
+        let len = 0
+        let start = Date.now()
+        for (let i = 0; i < 10; i++) {
+            len += window.b64_bench(10000, 1000)
+        }
+        console.log("js: len", len)
+        alert('js: ' + ((Date.now() - start) / 100) + " ms")
+    </script>
+</body>
+
+</html>
