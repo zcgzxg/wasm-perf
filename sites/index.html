@@ -1,39 +1,40 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>My HTML Page</title>
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
     <script src="./base64js.min.js"></script>
     <script src="./b64_bench.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>Welcome to my HTML page!</h1>
     <p>This is a basic HTML file.</p>
 
     <script type="module">
-        import { bench, initSync } from './pkg/b64_bench.js'
+      const worker = new Worker("./worker.js");
+      worker.onmessage = function (e) {
+        alert("wasm: " + e.data.toFixed(2) + " ms");
 
-        fetch('./pkg/b64_bench_bg.wasm').then(res => res.arrayBuffer()).then(res => {
-            initSync(res)
+        setTimeout(js_b64, 1000);
+      };
+      worker.postMessage(2);
 
-            let start = Date.now()
-            let len = 0
-            for (let i = 0; i < 10; i++) {
-                len += bench(10000, 1000)
-            }
-            console.log('wasm: ', len)
-            alert('wasm: ' + ((Date.now() - start) / 100) + " ms")
-        })
-
-        let len = 0
-        let start = Date.now()
-        for (let i = 0; i < 10; i++) {
-            len += window.b64_bench(10000, 1000)
+      function js_b64() {
+        let len = 0;
+        performance.mark("js-start");
+        for (let i = 0; i < 2; i++) {
+          len += window.b64_bench(100000, 1000);
         }
-        console.log("js: len", len)
-        alert('js: ' + ((Date.now() - start) / 100) + " ms")
+        console.log("js: len ", len);
+        performance.measure("js", "js-start");
+        alert(
+          "js: " +
+            performance.getEntriesByName("js")[0].duration.toFixed(2) +
+            " ms"
+        );
+      }
     </script>
-</body>
-
+  </body>
 </html>
