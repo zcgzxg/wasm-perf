@@ -20,4 +20,4 @@ RUSTFLAGS='-C target-feature=+atomics,+bulk-memory,+mutable-globals' \
 wasm-bindgen \
   target/wasm32-unknown-unknown/release/b64_bench.wasm \
   --out-dir ./sites/pkg \
-  --target no-modules
+  --target web
